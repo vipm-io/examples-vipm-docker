@@ -4,6 +4,8 @@ This repository contains docker examples.
 
 ## Using NI's offical LabVIEW Container
 
+This example is located in the [examples/ni_labview_official_container_with_vipm](examples/ni_labview_official_container_with_vipm) directory.
+
 You can find more information about NI's official container image, as well as some other examples, here:
 
 - https://hub.docker.com/r/nationalinstruments/labview
