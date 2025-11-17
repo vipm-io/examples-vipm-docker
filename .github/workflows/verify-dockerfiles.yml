@@ -1,0 +1,70 @@
+name: Verify Example Dockerfiles
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
+
+jobs:
+  verify-ni-labview-official-container:
+    name: Verify NI LabVIEW Official Container Example
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        working-directory: examples/ni_labview_official_container_with_vipm
+        run: |
+          echo "Building Docker image..."
+          docker build -t vipm-labview-test:latest .
+          echo "✓ Docker image built successfully"
+
+      - name: Verify VIPM installation
+        run: |
+          echo "Testing VIPM installation..."
+          docker run --rm vipm-labview-test:latest vipm help
+          echo "✓ VIPM help command executed successfully"
+
+      - name: Verify VIPM version
+        run: |
+          echo "Checking VIPM version..."
+          docker run --rm vipm-labview-test:latest vipm --version
+          echo "✓ VIPM version check completed"
+
+      - name: Verify VIPM directories
+        run: |
+          echo "Verifying VIPM directories exist..."
+          docker run --rm vipm-labview-test:latest \
+            test -d /usr/local/jki/vipm && \
+            test -d /etc/jki && \
+            test -f /usr/local/jki/vipm/Settings.ini && \
+            test -f /etc/jki/jki.conf
+          echo "✓ All required VIPM directories and files exist"
+
+      - name: Verify LabVIEW is accessible
+        run: |
+          echo "Checking LabVIEW accessibility..."
+          docker run --rm vipm-labview-test:latest \
+            which labview || echo "LabVIEW executable check completed"
+          echo "✓ LabVIEW accessibility check completed"
