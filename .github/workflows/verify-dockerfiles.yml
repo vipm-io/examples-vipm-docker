@@ -5,10 +5,18 @@ on:
     branches:
       - main
       - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
   pull_request:
     branches:
       - main
       - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
   workflow_dispatch:
 
 jobs:
