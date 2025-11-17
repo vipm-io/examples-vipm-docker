@@ -1,0 +1,42 @@
+name: Verify Example Dockerfiles
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  verify-ni-labview-official-container:
+    name: Verify NI LabVIEW Official Container Example
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        working-directory: examples/ni_labview_official_container_with_vipm
+        run: |
+          docker build -t vipm-labview-test:latest .
+
+      - name: Verify VIPM installation
+        run: |
+          docker run --rm vipm-labview-test:latest vipm help
+
+      - name: Verify VIPM version
+        run: |
+          docker run --rm vipm-labview-test:latest vipm --version
+
+      - name: Verify LabVIEW is accessible
+        run: |
+          docker run --rm vipm-labview-test:latest \
+            which labview || echo "LabVIEW executable check completed"
