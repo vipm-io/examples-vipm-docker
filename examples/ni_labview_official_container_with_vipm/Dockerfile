@@ -1,7 +1,5 @@
 FROM nationalinstruments/labview:2025q3patch1-linux
 
-RUN chown -R 
-
 # Install VIPM
 RUN apt-get update \
   && apt-get install -y wget \
