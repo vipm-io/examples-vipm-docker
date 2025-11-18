@@ -86,6 +86,21 @@ RUN nipkg feed-add --name="%LV2020_RTE_FEED_NAME%" "%LV2020_RTE_FEED_URL%" &&\
     nipkg install --accept-eulas --yes %LV2020_RTE_PACKAGE% & exit 0
 
 ######################################
+# VIPM Installation
+######################################
+
+RUN powershell \
+    $OriginalProgress = $ProgressPreference; \
+    $ProgressPreference = 'SilentlyContinue'; \
+    Write-Output "Downloading VIPM installer..."; \
+    Invoke-WebRequest -Uri "https://packages.jki.net/vipm/preview/vipm-setup-latest-preview.exe" -OutFile "${env:TEMP}\vipm-setup.exe"; \
+    $ProgressPreference = $OriginalProgress; Write-Output "Installing VIPM silently..."; \
+    Start-Process -FilePath "${env:TEMP}\vipm-setup.exe" -ArgumentList '/exenoui','/qn','/norestart' -Wait; \
+    Write-Output "Cleaning up installer file..."; \
+    Remove-Item "${env:TEMP}\vipm-setup.exe"; \
+    Write-Output "VIPM installation completed!"
+
+######################################
 # VIPM Configuration Prerequisites
 # (helps to avoid first-run issuess)
 ######################################
@@ -98,21 +113,5 @@ RUN powershell -Command "New-Item -ItemType Directory -Force -Path $env:VIPM_PRO
 
 COPY ./vipm/jki.conf "C:/ProgramData/JKI/jki.conf"
 COPY ./vipm/Settings.ini "C:/ProgramData/JKI/VIPM/Settings.ini"
-
-######################################
-# VIPM Installation
-######################################
-
-RUN powershell \
-    $VipmUrl = "https://packages.jki.net/vipm/preview/vipm-setup-latest-preview.exe"; \
-    $OriginalProgress = $ProgressPreference; \
-    $ProgressPreference = 'SilentlyContinue'; \
-    Write-Output "Downloading VIPM installer..."; \
-    Invoke-WebRequest -Uri $VipmUrl -OutFile "$env:TEMP\vipm-setup.exe"; \
-    $ProgressPreference = $OriginalProgress; Write-Output "Installing VIPM silently..."; \
-    Start-Process -FilePath "$env:TEMP\vipm-setup.exe" -ArgumentList "/exenoui /qn /norestart" -Wait; \
-    Write-Output "Cleaning up installer file..."; \
-    Remove-Item "$env:TEMP\vipm-setup.exe"; \
-    Write-Output "VIPM installation completed!"
 
 WORKDIR "/"
