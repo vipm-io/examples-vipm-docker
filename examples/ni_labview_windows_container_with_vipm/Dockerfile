@@ -22,16 +22,15 @@ RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.Ser
 
 # Download, Install and Disable Package Caching
 WORKDIR /users/public/downloads
-ENV NIPM_VERSION "22.5.0"
-COPY ./download_nipm.ps1 .
-RUN powershell Set-ExecutionPolicy Bypass -Scope Process -Force; .\download_nipm.ps1
-
-RUN NIPackageManager.exe \
-    --passive \
-    --accept-eulas \
-    --prevent-reboot \
-    &&\
-    del NIPackageManager.exe
+ENV NIPM_VERSION "25.8.0"
+RUN powershell -Command "\
+    $ErrorActionPreference = 'Stop'; \
+    $ProgressPreference = 'SilentlyContinue'; \
+    Set-ExecutionPolicy Bypass -Scope Process -Force; \
+    $downloadUrl = \"https://download.ni.com/support/nipkg/products/ni-package-manager/installers/NIPackageManager${env:NIPM_VERSION}.exe\"; \
+    Invoke-WebRequest -Uri $downloadUrl -OutFile 'NIPackageManager.exe'; \
+    Start-Process -FilePath 'NIPackageManager.exe' -ArgumentList '--passive','--accept-eulas','--prevent-reboot' -Wait; \
+    Remove-Item 'NIPackageManager.exe'"
 
 # Add NI Package Manager to path, so we can always just execute 'nipkg'
 RUN setx /M PATH "%PATH%;C:\Program Files\National Instruments\NI Package Manager"
@@ -39,7 +38,7 @@ RUN setx /M PATH "%PATH%;C:\Program Files\National Instruments\NI Package Manage
 # Disable Packages Cache
 # https://knowledge.ni.com/KnowledgeArticleDetails?id=kA00Z0000019KdtSAE&l=en-US
 WORKDIR "/ProgramData/National Instruments/NI Package Manager/Settings"
-RUN echo [nipkg]>>nipkg.ini &&\
+RUN echo [nipkg]>>nipkg.ini; \
     echo cachepackages=false>>nipkg.ini
 
 
@@ -57,11 +56,11 @@ ENV LABVIEW_NIPKG_NAME "ni-labview-2025-core-en"
 
 # Download and Install LabVIEW
 WORKDIR "/Program Files/National Instruments/NI Package Manager"
-RUN nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%" "%LABVIEW_RELEASED_FEED_URL%" &&\
-    nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%-critical" "%LABVIEW_RELEASED_FEED_URL%-critical" &&\
-    nipkg update &&\
-    powershell -Command New-Item ${env:LABVIEW_FOLDER} -ItemType Directory &&\
-    setx /M PATH "%PATH%;C:\Program Files\National Instruments\Shared\License Manager" &&\
+RUN nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%" "%LABVIEW_RELEASED_FEED_URL%"; \
+    nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%-critical" "%LABVIEW_RELEASED_FEED_URL%-critical"; \
+    nipkg update; \
+    powershell -Command New-Item ${env:LABVIEW_FOLDER} -ItemType Directory; \
+    setx /M PATH "%PATH%;C:\Program Files\National Instruments\Shared\License Manager"; \
     nipkg install --accept-eulas --yes "%LABVIEW_NIPKG_NAME%" ni-license-manager & exit 0
 
 # Configure LabVIEW for CI/CD and VI Server TCP access
@@ -80,9 +79,9 @@ ENV LV2020_RTE_FEED_URL_CRITICAL "https://download.ni.com/support/nipkg/products
 ENV LV2020_RTE_PACKAGE "ni-labview-2020-runtime-engine"
 
 WORKDIR "/Program Files/National Instruments/NI Package Manager"
-RUN nipkg feed-add --name="%LV2020_RTE_FEED_NAME%" "%LV2020_RTE_FEED_URL%" &&\
-    nipkg feed-add --name="%LV2020_RTE_FEED_NAME_CRITICAL%" "%LV2020_RTE_FEED_URL_CRITICAL%" &&\
-    nipkg update &&\
+RUN nipkg feed-add --name="%LV2020_RTE_FEED_NAME%" "%LV2020_RTE_FEED_URL%"; \
+    nipkg feed-add --name="%LV2020_RTE_FEED_NAME_CRITICAL%" "%LV2020_RTE_FEED_URL_CRITICAL%"; \
+    nipkg update; \
     nipkg install --accept-eulas --yes %LV2020_RTE_PACKAGE% & exit 0
 
 ######################################
