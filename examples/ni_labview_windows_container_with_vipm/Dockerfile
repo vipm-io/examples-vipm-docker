@@ -56,14 +56,15 @@ ENV LABVIEW_NIPKG_NAME "ni-labview-2025-core-en"
 
 # Download and Install LabVIEW
 WORKDIR "/Program Files/National Instruments/NI Package Manager"
-RUN nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%" "%LABVIEW_RELEASED_FEED_URL%"; \
-    nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%-critical" "%LABVIEW_RELEASED_FEED_URL%-critical"; \
-    nipkg update; \
-    powershell -Command New-Item ${env:LABVIEW_FOLDER} -ItemType Directory; \
-    setx /M PATH "%PATH%;C:\Program Files\National Instruments\Shared\License Manager"; \
+RUN nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%" "%LABVIEW_RELEASED_FEED_URL%" &&\
+    nipkg feed-add --name="%LABVIEW_RELEASED_FEED_NAME%-critical" "%LABVIEW_RELEASED_FEED_URL%-critical" &&\
+    nipkg update &&\
+    powershell -Command New-Item ${env:LABVIEW_FOLDER} -ItemType Directory  &&\
+    setx /M PATH "%PATH%;C:\Program Files\National Instruments\Shared\License Manager"  &&\
     nipkg install --accept-eulas --yes "%LABVIEW_NIPKG_NAME%" ni-license-manager & exit 0
 
 # Configure LabVIEW for CI/CD and VI Server TCP access
+ENV EnableCICDFeaturesForLabVIEW "TRUE"
 WORKDIR "$LABVIEW_FOLDER"
 COPY ./LabVIEW.ini .
 
@@ -79,9 +80,9 @@ ENV LV2020_RTE_FEED_URL_CRITICAL "https://download.ni.com/support/nipkg/products
 ENV LV2020_RTE_PACKAGE "ni-labview-2020-runtime-engine"
 
 WORKDIR "/Program Files/National Instruments/NI Package Manager"
-RUN nipkg feed-add --name="%LV2020_RTE_FEED_NAME%" "%LV2020_RTE_FEED_URL%"; \
-    nipkg feed-add --name="%LV2020_RTE_FEED_NAME_CRITICAL%" "%LV2020_RTE_FEED_URL_CRITICAL%"; \
-    nipkg update; \
+RUN nipkg feed-add --name="%LV2020_RTE_FEED_NAME%" "%LV2020_RTE_FEED_URL%" &&\
+    nipkg feed-add --name="%LV2020_RTE_FEED_NAME_CRITICAL%" "%LV2020_RTE_FEED_URL_CRITICAL%" &&\
+    nipkg update &&\
     nipkg install --accept-eulas --yes %LV2020_RTE_PACKAGE% & exit 0
 
 ######################################
