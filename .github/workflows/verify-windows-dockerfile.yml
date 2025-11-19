@@ -40,7 +40,7 @@ jobs:
           VIPM_EMAIL=test@example.com
           WINDOWS_VERSION=10.0.19042.1706-amd64
           "@ | Out-File -FilePath .env -Encoding utf8
-          Write-Host "✓ Created .env file for testing"
+          Write-Host "[OK] Created .env file for testing"
 
       - name: Build Docker image
         working-directory: examples/ni_labview_windows_container_with_vipm
@@ -52,9 +52,9 @@ jobs:
             --build-arg WINDOWS_VERSION=10.0.19042.1706-amd64 `
             -t vipm-labview-windows-test:latest .
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ Docker image built successfully"
+            Write-Host "[OK] Docker image built successfully"
           } else {
-            Write-Host "✗ Docker image build failed"
+            Write-Host "[FAIL] Docker image build failed"
             exit 1
           }
 
@@ -65,9 +65,9 @@ jobs:
           docker run --rm vipm-labview-windows-test:latest `
             powershell -Command "vipm --version"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ VIPM is installed and accessible"
+            Write-Host "[OK] VIPM is installed and accessible"
           } else {
-            Write-Host "✗ VIPM verification failed"
+            Write-Host "[FAIL] VIPM verification failed"
             exit 1
           }
 
@@ -78,9 +78,9 @@ jobs:
           docker run --rm vipm-labview-windows-test:latest `
             powershell -Command "vipm help"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ VIPM help command executed successfully"
+            Write-Host "[OK] VIPM help command executed successfully"
           } else {
-            Write-Host "✗ VIPM help command failed"
+            Write-Host "[FAIL] VIPM help command failed"
             exit 1
           }
 
@@ -92,17 +92,17 @@ jobs:
             powershell -Command `
               "Test-Path 'C:\ProgramData\JKI\VIPM\Settings.ini'"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ VIPM Settings.ini exists"
+            Write-Host "[OK] VIPM Settings.ini exists"
           }
 
           docker run --rm vipm-labview-windows-test:latest `
             powershell -Command `
               "Test-Path 'C:\ProgramData\JKI\jki.conf'"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ JKI configuration file exists"
+            Write-Host "[OK] JKI configuration file exists"
           }
 
-          Write-Host "✓ All VIPM directories and files verified"
+          Write-Host "[OK] All VIPM directories and files verified"
 
       - name: Verify LabVIEW installation
         shell: powershell
@@ -112,9 +112,9 @@ jobs:
           docker run --rm vipm-labview-windows-test:latest `
             powershell -Command "Test-Path '$lvPath'"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ LabVIEW 2025 installation directory exists"
+            Write-Host "[OK] LabVIEW 2025 installation directory exists"
           } else {
-            Write-Host "✗ LabVIEW installation verification failed"
+            Write-Host "[FAIL] LabVIEW installation verification failed"
             exit 1
           }
 
@@ -127,9 +127,9 @@ jobs:
           docker run --rm vipm-labview-windows-test:latest `
             powershell -Command "Test-Path '$lvIni'"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ LabVIEW.ini configuration file exists"
+            Write-Host "[OK] LabVIEW.ini configuration file exists"
           } else {
-            Write-Host "✗ LabVIEW configuration verification failed"
+            Write-Host "[FAIL] LabVIEW configuration verification failed"
             exit 1
           }
 
@@ -140,8 +140,8 @@ jobs:
           docker run --rm vipm-labview-windows-test:latest `
             powershell -Command "nipkg version"
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ NIPM is installed and accessible"
+            Write-Host "[OK] NIPM is installed and accessible"
           } else {
-            Write-Host "✗ NIPM verification failed"
+            Write-Host "[FAIL] NIPM verification failed"
             exit 1
           }
