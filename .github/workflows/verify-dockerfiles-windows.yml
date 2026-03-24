@@ -1,0 +1,51 @@
+name: Verify Windows Dockerfile
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
+
+jobs:
+  verify-ni-labview-windows-container:
+    name: Verify NI LabVIEW 2026 Windows Container Example
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Pull LabVIEW Windows container image
+        run: docker pull nationalinstruments/labview:latest-windows
+
+      - name: Build Docker image
+        working-directory: examples/ni_labview_2026_windows_container_with_vipm
+        run: docker build -t vipm-labview-windows-test:latest .
+
+      - name: Verify VIPM installation
+        run: |
+          echo "Testing VIPM installation..."
+          docker run --rm vipm-labview-windows-test:latest powershell -Command "vipm help"
+          echo "VIPM help command executed successfully"
+
+      - name: Verify VIPM version
+        run: |
+          echo "Checking VIPM version..."
+          docker run --rm vipm-labview-windows-test:latest powershell -Command "vipm --version"
+          echo "VIPM version check completed"
+
