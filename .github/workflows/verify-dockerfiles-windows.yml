@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Pull LabVIEW Windows container image
         run: docker pull nationalinstruments/labview:latest-windows
