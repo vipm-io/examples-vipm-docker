@@ -36,6 +36,10 @@ Run the following command on your host computer, to build and then run your cont
 
 `docker compose run --rm vipm-labview`
 
+Or ensure the container is rebuilt (if needed) and run:
+
+`docker compose run --build --rm vipm-labview`
+
 ## Using VIPM (to install packages in LabVIEW) from inside the running container
 
 The following steps are useful for CI automation like GitHub actions.  We intend to provide examples, which will likely end up in the .github/workflows/ directory of this repository. 
