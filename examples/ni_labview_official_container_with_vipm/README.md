@@ -14,6 +14,7 @@ You can find more information about NI's official container image, as well as so
 - `.env.example` is a template file you will populate and save as `.env` which contains the environment variables that will be used by your running container.
 - `docker-compose.yml` is a `docker compose` file that adds a little bit of structure to your docker configuration.
 - `Dockerfile` the specific commands (and base/starting container) for building your container.
+- `test.sh` a convenience script that builds the image and drops you into an interactive shell inside a fresh container.
 
 ### Create a .env file with your VIPM Pro serial number information.
 
@@ -35,6 +36,10 @@ VIPM_EMAIL=your.email@example.com
 Run the following command on your host computer, to build and then run your container, opening a bash shell within the container:
 
 `docker compose run --rm vipm-labview`
+
+Alternatively, run the `test.sh` script, which builds the image and drops you into an interactive shell inside a fresh container:
+
+`./test.sh`
 
 ## Using VIPM (to install packages in LabVIEW) from inside the running container
 
