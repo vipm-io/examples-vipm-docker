@@ -1,0 +1,14 @@
+services:
+  vipm-labview-windows:
+    build:
+      context: .
+      args:
+        WINDOWS_VERSION: ${WINDOWS_VERSION:-latest}
+    image: vipm-labview-windows
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    command: >
+      powershell.exe
+
